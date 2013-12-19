@@ -31,7 +31,7 @@ TransactionStatus TransactionalMemory::startTransaction(int** dataSet, int dataS
 
     initialize(rec_i, dataSet, dataSetSize);
     rec_i->stable = true;
-    transaction(rec_i, rec_i->version, true);
+    transaction(rec_i, rec_i->version, true, dataSetSize);
     rec_i->stable = false;
     rec_i->version++;
 
@@ -58,7 +58,84 @@ void TransactionalMemory::initialize(Rec *rec, int **dataSet, int dataSetSize)
     }
 }
 
-void TransactionalMemory::transaction(Rec *rec, int version, bool isInitiator)
+void TransactionalMemory::transaction(Rec *rec, int version, bool isInitiator, int dataSetSize)
+{
+    acquireOwnerships(rec, version);
+
+    Status status = ll_status(rec->status);
+
+    if (status.first == Null)
+    {
+        if (version != rec->version) return;
+        sc_status(rec->status, Status(Success, 0));
+    }
+
+    status = ll_status(rec->status);
+
+    if (status.first == Success)
+    {
+        agreeOldValues(rec, version);
+
+        int* newValues = increment(rec->oldValues, dataSetSize);
+
+        updateMemory(rec, version, newValues);
+        releaseOwnerShips(rec, version);
+    }
+    else
+    {
+        releaseOwnerShips(rec, version);
+
+        if (isInitiator)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+}
+
+void TransactionalMemory::acquireOwnerships(Rec *rec, int version)
 {
 
+}
+
+void TransactionalMemory::agreeOldValues(Rec *rec, int version)
+{
+
+}
+
+void TransactionalMemory::updateMemory(Rec *rec, int version, int *newValues)
+{
+
+}
+
+void TransactionalMemory::releaseOwnerShips(Rec *rec, int version)
+{
+
+}
+
+// LL/SC
+Status TransactionalMemory::ll_status(Status status)
+{
+
+}
+
+bool TransactionalMemory::sc_status(Status target, Status status)
+{
+
+}
+
+// CalcNewValues
+int* TransactionalMemory::increment(int **oldValues, int dataSetSize)
+{
+    int* newValues = new int[dataSetSize];
+
+    for (int i = 0; i < dataSetSize; i++)
+    {
+        newValues[i] = *(oldValues[i]) + 1;
+    }
+
+    return newValues;
 }
