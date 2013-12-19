@@ -7,6 +7,7 @@ class Rec
 {
 public:
     Status status;
+    bool stable;
     int version;
     bool* allWritten;
     int size;

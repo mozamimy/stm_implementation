@@ -3,7 +3,8 @@
 
 #include <utility>
 
-enum _status {Success, Failure, Null};
-typedef std::pair<_status, int> Status;
+enum Condition {Success, Failure, Null};
+typedef std::pair<Condition, int> Status;
+typedef std::pair<Condition, int**> TransactionStatus;
 
 #endif // STATUS_H
